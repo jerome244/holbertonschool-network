@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Display all active IPv4 addresses on this machine, one per line
+# Ce script affiche toutes les adresses IP IPv4 actives sur la machine.
 
-set -euo pipefail
-
-# List IPv4 addresses on UP interfaces (includes loopback), strip CIDR suffix
-ip -o -4 addr show up | awk '{split($4,a,"/"); print a[1]}'
+# Utilisation de `ifconfig` pour lister les interfaces réseau et de `grep` pour extraire les adresses IPv4
+ifconfig | grep 'inet ' | awk '{print $2}'
