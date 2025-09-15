@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Configure /etc/hosts so localhost->127.0.0.2 and facebook.com->8.8.8.8
+
+set -euo pipefail
+
+# Must run as root
+if [ "${EUID:-$(id -u)}" -ne 0 ]; then
+  echo "Please run as root (e.g., sudo $0)"
+  exit 1
+fi
+
+# Backup current hosts file
+backup="/etc/hosts.bak.$(date +%s)"
+cp /etc/hosts "$backup"
+
+# Build a new hosts file in a temp file:
+# 1) Required mappings first (so they take precedence)
+# 2) Then existing lines EXCEPT ones that mention these hostnames
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+printf '127.0.0.2\tlocalhost\n8.8.8.8\tfacebook.com\n' > "$tmp"
+
+awk '
+  /^[[:space:]]*#/ { print; next }   # keep comments
+  {
+    skip=0
+    for (i=1; i<=NF; i++) {
+      if ($i=="localhost" || $i=="facebook.com") { skip=1; break }
+    }
+    if (!skip) print
+  }
+' /etc/hosts >> "$tmp"
+
+install -m 644 "$tmp" /etc/hosts
+echo "Updated /etc/hosts (backup saved to: $backup)"

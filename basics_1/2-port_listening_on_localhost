@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Listen on TCP port 98 bound to whatever 'localhost' resolves to
+
+set -euo pipefail
+
+# Privileged port (<1024) requires root
+if [ "${EUID:-$(id -u)}" -ne 0 ]; then
+  echo "Please run as root (e.g., sudo $0)"
+  exit 1
+fi
+
+# Resolve the current localhost IP (works even if you set it to 127.0.0.2)
+ip_addr="$(getent hosts localhost | awk '{print $1; exit}')"
+
+# Need netcat
+if ! command -v nc >/dev/null 2>&1; then
+  echo "Error: 'nc' (netcat) is required." >&2
+  exit 1
+fi
+
+# Start a listener on localhost:98 and print anything received to stdout.
+# Try OpenBSD nc flags first; fall back to a portable form.
+nc -l -p 98 -s "$ip_addr" 2>/dev/null || nc -l "$ip_addr" 98

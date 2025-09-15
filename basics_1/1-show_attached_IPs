@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Display all active IPv4 addresses on this machine, one per line
+
+set -euo pipefail
+
+# List IPv4 addresses on UP interfaces (includes loopback), strip CIDR suffix
+ip -o -4 addr show up | awk '{split($4,a,"/"); print a[1]}'
