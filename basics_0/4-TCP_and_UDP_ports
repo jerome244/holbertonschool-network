@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
-# Display listening TCP/UDP and UNIX domain sockets with their owning PID/program
+# This script displays all listening TCP and UDP ports along with the PID and program name
 
-if command -v netstat >/dev/null 2>&1; then
-  # Internet sockets (TCP/UDP)
-  netstat -lntup
-  # UNIX domain sockets
-  netstat -lxp
-elif command -v ss >/dev/null 2>&1; then
-  ss -ltnup
-  ss -lxnp
-else
-  echo "Error: neither 'netstat' nor 'ss' is installed." >&2
-  exit 1
-fi
+sudo netstat -tulnvp | grep LISTEN
