@@ -7,16 +7,9 @@ if command -v netstat >/dev/null 2>&1; then
   # UNIX domain sockets
   netstat -lxp
 elif command -v ss >/dev/null 2>&1; then
-  # Internet sockets (TCP/UDP)
   ss -ltnup
-  # UNIX domain sockets
   ss -lxnp
 else
   echo "Error: neither 'netstat' nor 'ss' is installed." >&2
   exit 1
 fi
-
-
-
-#./4-TCP_and_UDP_ports
-#sudo ./4-TCP_and_UDP_ports

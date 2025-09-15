@@ -7,10 +7,3 @@ if [ $# -lt 1 ]; then
 fi
 
 ping -c 5 "$1"
-
-
-#cd ~/holberton/holbertonschool-network/basics_0
-#sed -i 's/\r$//' 5-is_the_host_on_the_network
-#head -2 5-is_the_host_on_the_network
-#chmod +x 5-is_the_host_on_the_network
-#./5-is_the_host_on_the_network 8.8.8.8
