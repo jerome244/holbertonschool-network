@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Display listening TCP/UDP and UNIX domain sockets with their owning PID/program
+
+if command -v netstat >/dev/null 2>&1; then
+  # Internet sockets (TCP/UDP)
+  netstat -lntup
+  # UNIX domain sockets
+  netstat -lxp
+elif command -v ss >/dev/null 2>&1; then
+  # Internet sockets (TCP/UDP)
+  ss -ltnup
+  # UNIX domain sockets
+  ss -lxnp
+else
+  echo "Error: neither 'netstat' nor 'ss' is installed." >&2
+  exit 1
+fi
+
+
+
+#./4-TCP_and_UDP_ports
+#sudo ./4-TCP_and_UDP_ports
