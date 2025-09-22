@@ -1,0 +1,91 @@
+# What Really Happens When You Type https://www.google.com and Press Enter
+
+This is one of the most classic software engineering interview questions. It looks simple — you type `www.google.com` into your browser and press Enter — but under the hood, a huge amount of technology comes into play. Let’s walk through it step by step.
+
+---
+
+## 1. DNS Request
+Your browser first needs the IP address of `www.google.com`. Humans use names, but computers route with IPs.
+
+- Browser cache is checked first.  
+- If not found, the OS resolver queries a recursive DNS server (usually provided by your ISP or a public one like 8.8.8.8).  
+- The resolver walks the DNS hierarchy: root → `.com` TLD → Google’s authoritative DNS.  
+- Finally, it returns an **A/AAAA record** mapping `www.google.com` to one or more IP addresses.
+
+---
+
+## 2. TCP/IP Connection
+With the IP in hand, the browser opens a connection to port **443** on that server.
+
+- A **TCP three-way handshake** (SYN → SYN-ACK → ACK) establishes a reliable channel.  
+- Packets travel across the Internet, wrapped in IP datagrams, routed hop by hop until they reach Google’s network.
+
+---
+
+## 3. Firewall
+Along the way, traffic crosses firewalls. At Google’s edge, firewalls enforce rules:  
+- Only allow connections to port 443.  
+- Block suspicious or malicious traffic.  
+This ensures only valid HTTPS traffic reaches Google servers.
+
+---
+
+## 4. HTTPS and SSL/TLS
+Security comes next. The browser and server perform a **TLS handshake**:  
+- The server presents its SSL/TLS certificate proving it is `google.com`.  
+- The browser verifies the certificate via trusted Certificate Authorities.  
+- They negotiate session keys to encrypt communication.  
+Now all further HTTP traffic is **encrypted and authenticated**.
+
+---
+
+## 5. Load Balancer
+Your request first hits a **Google load balancer**.  
+- The load balancer distributes incoming traffic across thousands of backend servers.  
+- Common algorithms: round-robin, least-connections, consistent hashing.  
+- This prevents overload and ensures high availability.
+
+---
+
+## 6. Web Server
+A web server (often Nginx or a custom Google frontend) handles your HTTP request.  
+- It can serve static files (CSS, JavaScript, logos).  
+- For dynamic content, it forwards the request to an **application server**.
+
+---
+
+## 7. Application Server
+The application server runs Google’s business logic. For example:  
+- It generates the HTML for the search page.  
+- It talks to services that power autocomplete, ads, or personalization.  
+- It prepares the response to send back.
+
+---
+
+## 8. Database
+Behind the scenes, the application server queries Google’s distributed databases (e.g., Spanner, Bigtable).  
+- The database stores user data, index of the web, configuration, and more.  
+- Results are retrieved and returned to the app server, which builds the final response.
+
+---
+
+## Back to Your Browser
+The response flows back through the stack:  
+App Server → Web Server → Load Balancer → Encrypted over TCP/IP → Browser.  
+
+Your browser decrypts the packets, parses the HTTP response, downloads additional resources, and finally renders the Google homepage.
+
+---
+
+## Summary
+Typing `https://www.google.com` and pressing Enter triggers:  
+1. DNS resolution  
+2. TCP/IP handshake  
+3. Firewall checks  
+4. TLS handshake (HTTPS)  
+5. Load balancing  
+6. Web server processing  
+7. Application server logic  
+8. Database queries  
+
+All of this happens in **milliseconds** — proof of the incredible complexity hidden behind a single keystroke.
