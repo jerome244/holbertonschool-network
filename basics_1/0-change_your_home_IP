@@ -1,34 +1,7 @@
 #!/usr/bin/env bash
-# Configure /etc/hosts so localhost -> 127.0.0.2 and facebook.com -> 8.8.8.8
+# Changes localhost and facebook.com IP associations in hosts file.
 
-set -euo pipefail
-
-if [ "${EUID:-$(id -u)}" -ne 0 ]; then
-  echo "This script must be run as root (try: sudo $0)" >&2
-  exit 1
-fi
-
-backup="/etc/hosts.bak.$(date +%s)"
-cp /etc/hosts "$backup"
-
-tmp="$(mktemp)"
-# Keep all lines that do not list 'localhost' or 'facebook.com' as a hostname token
-awk '
-{
-  keep = 1
-  for (i = 1; i <= NF; i++) {
-    if ($i == "localhost" || $i == "facebook.com") { keep = 0; break }
-  }
-  if (keep) print
-}
-' /etc/hosts > "$tmp"
-
-{
-  printf "%s\t%s\n" "127.0.0.2" "localhost"
-  printf "%s\t%s\n" "8.8.8.8" "facebook.com"
-  cat "$tmp"
-} > /etc/hosts
-
-rm -f "$tmp"
-
-echo "Updated /etc/hosts (backup: $backup)"
+grep -v -E 'localhost|facebook.com' /etc/hosts > /tmp/hosts
+cat /tmp/hosts > /etc/hosts
+echo "127.0.0.2 localhost" >> /etc/hosts
+echo "8.8.8.8 facebook.com" >> /etc/hosts
